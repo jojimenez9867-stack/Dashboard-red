@@ -85,10 +85,10 @@ const detalleMocks: Record<
     titulo: 'Detalle: Ejecución Acciona (%)',
     notaProm: 84,
     barras: [
-      { name: 'Seguridad', valor: 86 },
-      { name: 'Servicio', valor: 82 },
-      { name: 'Calidad', valor: 85 },
-      { name: 'Sustentabilidad', valor: 83 },
+      { name: 'Accionista', valor: 86 },
+      { name: 'Cliente', valor: 82 },
+      { name: 'Equipo Ampliado', valor: 85 },
+      { name: 'Comunidad', valor: 83 },
     ],
   },
   ventas: {
