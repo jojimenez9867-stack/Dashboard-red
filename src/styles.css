@@ -1,0 +1,30 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --copec-red: #E30613;
+  --copec-blue: #003366;
+  --copec-blue2: #0055A4;
+}
+
+.card { @apply rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm; }
+.card-title { @apply font-semibold text-copec-blue dark:text-slate-200; }
+.btn { @apply inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 px-3 py-2 text-sm font-semibold; }
+.btn-primary { @apply bg-copec-red text-white border-copec-red; }
+.btn-ghost { @apply bg-slate-50 dark:bg-slate-800; }
+.kpi { @apply text-3xl font-extrabold text-copec-red; }
+.badge { @apply inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-lg; }
+.badge-ok { @apply bg-green-600 text-white; }
+.badge-warn { @apply bg-amber-500 text-white; }
+.badge-out { @apply bg-red-600 text-white; }
+.input { @apply border rounded-lg px-3 py-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800; }
+.select { @apply border rounded-lg px-3 py-2 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800; }
+hr.div { @apply border-slate-200 dark:border-slate-800; }
+.dot { @apply inline-block w-2.5 h-2.5 rounded-full; }
+.dot-green { @apply bg-green-600; } .dot-amber { @apply bg-amber-500; } .dot-red { @apply bg-red-600; }
+
+@media print {
+  .no-print { display: none !important; }
+}

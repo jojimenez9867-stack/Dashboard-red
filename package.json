@@ -1,0 +1,26 @@
+{
+  "name": "dashboard-copec",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.17",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  }
+}
