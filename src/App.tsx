@@ -29,7 +29,88 @@ interface TaskItem {
   createdAt: number
 }
 
-export default function App() {
+export default function App() {// === BLOQUE NUEVO: Tipos y detalle por métrica ===
+type MetricKey = 'satisfaccion' | 'clima' | 'acciona' | 'ventas' | 'comunidad' | 'formacion'
+
+const metricLabels: Record<MetricKey, string> = {
+  satisfaccion: 'Satisfacción Global',
+  clima: 'Clima',
+  acciona: 'Acciona (%)',
+  ventas: 'Ventas (%)',
+  comunidad: 'Comunidad',
+  formacion: 'Formación (%)',
+}
+
+const detalleMocks: Record<
+  MetricKey,
+  { titulo: string; barras: { name: string; valor: number }[]; notaProm: number; variacion?: string }
+> = {
+  satisfaccion: {
+    titulo: 'Detalle: Satisfacción Global por Área/Servicio',
+    notaProm: 6.3,
+    variacion: '+1.6%',
+    barras: [
+      { name: 'Atención al Cliente', valor: 6.6 },
+      { name: 'Combustible', valor: 6.2 },
+      { name: 'Tienda', valor: 6.1 },
+      { name: 'Lavado', valor: 6.0 },
+    ],
+  },
+  clima: {
+    titulo: 'Detalle: Clima Laboral por Dimensión',
+    notaProm: 6.1,
+    variacion: '+0.8%',
+    barras: [
+      { name: 'Comunicación', valor: 6.2 },
+      { name: 'Liderazgo', valor: 6.0 },
+      { name: 'Reconocimiento', valor: 5.9 },
+      { name: 'Condiciones', valor: 6.1 },
+    ],
+  },
+  acciona: {
+    titulo: 'Detalle: Ejecución Acciona (%)',
+    notaProm: 84,
+    barras: [
+      { name: 'KPI Global', valor: 86 },
+      { name: 'Accionistas', valor: 82 },
+      { name: 'Cliente', valor: 85 },
+      { name: 'Equipo Ampliado', valor: 83 },
+      { name: 'Comunidad', valor: 90 },
+      { name: 'Medio Ambiente y Seguridad', valor: 89 },
+      { name: 'Ranking', valor: 115 },
+    ],
+  },
+  ventas: {
+    titulo: 'Detalle: Ventas (%) por Línea',
+    notaProm: 93,
+    barras: [
+      { name: 'Combustibles', valor: 95 },
+      { name: 'Tienda', valor: 90 },
+      { name: 'Lubricantes', valor: 88 },
+      { name: 'Aguas', valor: 89 },
+    ],
+  },
+  comunidad: {
+    titulo: 'Campañas: Relacionamiento Comunitario',
+    notaProm: 80,
+    barras: [
+      { name: 'Día del libro', valor: 82 },
+      { name: 'Conoce a tus vecinos', valor: 78 },
+      { name: 'Día del Carabinero', valor: 79 },
+    ],
+  },
+  formacion: {
+    titulo: 'Detalle: Formación (avance %)',
+    notaProm: 78,
+    barras: [
+      { name: 'Atención Cliente', valor: 82 },
+      { name: 'Operación Segura', valor: 76 },
+      { name: 'Seguridad', valor: 79 },
+      { name: 'Liderazgo', valor: 75 },
+    ],
+  },
+}
+
   const [vista, setVista] = useState<'general'|'zona'|'jefes'>('general')
   const [periodo, setPeriodo] = useState<'1m'|'3m'|'6m'|'1a'>('3m')
   const [busqueda, setBusqueda] = useState('')
