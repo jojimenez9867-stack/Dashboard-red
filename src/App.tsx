@@ -250,9 +250,9 @@ export default function App() {
       { jefe:'Jefe 3', zona:'Santiago',     desempeno: 6.1+adj, fortalezas:'Ejecución Acciona', mejoras:'Satisfacción y Clima', formacion:72, poa:80 },
     ]
     const campañas = [
-      { zona:'Centro-Norte', nombre:'Puertas Abiertas ESS', avance:72, impacto:'Alto' },
-      { zona:'Sur', nombre:'Reciclaje y Comunidad', avance:65, impacto:'Medio' },
-      { zona:'Santiago', nombre:'Seguridad Vial Escolar', avance:83, impacto:'Alto' },
+      { zona:'Centro-Norte', nombre:'Conoce a tus vecinos', avance:72, impacto:'Alto' },
+      { zona:'Sur', nombre:'Reciclaje', avance:65, impacto:'Medio' },
+      { zona:'Santiago', nombre:'Día del Carabinero', avance:83, impacto:'Alto' },
     ]
     return { zonas, jefes, campañas }
   }, [periodo])
