@@ -1,6 +1,8 @@
-
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar
+} from 'recharts'
 
 type Severidad = 'red' | 'amber'
 type Ambito = 'zona' | 'jefe'
@@ -29,8 +31,16 @@ interface TaskItem {
   createdAt: number
 }
 
-export default function App() {// === BLOQUE NUEVO: Tipos y detalle por métrica ===
-type MetricKey = 'satisfaccion' | 'clima' | 'acciona' | 'ventas' | 'comunidad' | 'formacion'
+/* ============================
+   Tipos + datasets de detalle
+============================ */
+type MetricKey =
+  | 'satisfaccion'
+  | 'clima'
+  | 'acciona'
+  | 'ventas'
+  | 'comunidad'
+  | 'formacion'
 
 const metricLabels: Record<MetricKey, string> = {
   satisfaccion: 'Satisfacción Global',
@@ -54,6 +64,9 @@ const detalleMocks: Record<
       { name: 'Combustible', valor: 6.2 },
       { name: 'Tienda', valor: 6.1 },
       { name: 'Lavado', valor: 6.0 },
+      { name: 'Mantenimiento', valor: 5.9 },
+      { name: 'Marketing', valor: 6.2 },
+      { name: 'Servicios Adicionales', valor: 6.0 },
     ],
   },
   clima: {
@@ -65,19 +78,17 @@ const detalleMocks: Record<
       { name: 'Liderazgo', valor: 6.0 },
       { name: 'Reconocimiento', valor: 5.9 },
       { name: 'Condiciones', valor: 6.1 },
+      { name: 'Desarrollo', valor: 6.2 },
     ],
   },
   acciona: {
     titulo: 'Detalle: Ejecución Acciona (%)',
     notaProm: 84,
     barras: [
-      { name: 'KPI Global', valor: 86 },
-      { name: 'Accionistas', valor: 82 },
-      { name: 'Cliente', valor: 85 },
-      { name: 'Equipo Ampliado', valor: 83 },
-      { name: 'Comunidad', valor: 90 },
-      { name: 'Medio Ambiente y Seguridad', valor: 89 },
-      { name: 'Ranking', valor: 115 },
+      { name: 'Seguridad', valor: 86 },
+      { name: 'Servicio', valor: 82 },
+      { name: 'Calidad', valor: 85 },
+      { name: 'Sustentabilidad', valor: 83 },
     ],
   },
   ventas: {
@@ -87,16 +98,17 @@ const detalleMocks: Record<
       { name: 'Combustibles', valor: 95 },
       { name: 'Tienda', valor: 90 },
       { name: 'Lubricantes', valor: 88 },
-      { name: 'Aguas', valor: 89 },
+      { name: 'Servicios', valor: 89 },
     ],
   },
   comunidad: {
-    titulo: 'Campañas: Relacionamiento Comunitario',
+    titulo: 'Detalle: Relacionamiento Comunitario',
     notaProm: 80,
     barras: [
-      { name: 'Día del libro', valor: 82 },
-      { name: 'Conoce a tus vecinos', valor: 78 },
-      { name: 'Día del Carabinero', valor: 79 },
+      { name: 'Actividades', valor: 82 },
+      { name: 'Participación', valor: 78 },
+      { name: 'Alianzas', valor: 79 },
+      { name: 'Impacto', valor: 81 },
     ],
   },
   formacion: {
@@ -104,13 +116,103 @@ const detalleMocks: Record<
     notaProm: 78,
     barras: [
       { name: 'Atención Cliente', valor: 82 },
-      { name: 'Operación Segura', valor: 76 },
+      { name: 'Operación', valor: 76 },
       { name: 'Seguridad', valor: 79 },
       { name: 'Liderazgo', valor: 75 },
     ],
   },
 }
 
+/* ============================
+        Modal de detalle
+============================ */
+function DetailModal({
+  open,
+  onClose,
+  metric,
+}: {
+  open: boolean
+  onClose: () => void
+  metric: MetricKey | null
+}) {
+  if (!open || !metric) return null
+  const dataset = detalleMocks[metric]
+  const isPct = ['acciona', 'ventas', 'formacion'].includes(metric)
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      aria-modal
+      role="dialog"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/40" />
+      {/* Card */}
+      <div
+        className="relative card w-[92vw] max-w-[960px] p-4 md:p-6 z-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          aria-label="Cerrar"
+          onClick={onClose}
+          className="absolute right-3 top-3 rounded-lg px-2 py-1 text-sm btn"
+        >
+          ✕
+        </button>
+
+        <h3 className="card-title mb-2">{dataset.titulo}</h3>
+
+        <div className="flex items-center gap-3 mb-3">
+          <div className="text-3xl font-extrabold text-[--copec-red]">
+            {dataset.notaProm}{isPct ? '%' : ''}
+          </div>
+          {dataset.variacion && (
+            <span className="badge badge-ok">↑ {dataset.variacion}</span>
+          )}
+        </div>
+
+        <div style={{ width: '100%', height: 300 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={dataset.barras}
+              layout="vertical"
+              margin={{ left: 80, right: 16, top: 8, bottom: 8 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                type="number"
+                domain={[0, isPct ? 100 : 7]}
+              />
+              <YAxis dataKey="name" type="category" width={140} />
+              <Tooltip
+                formatter={(v: number) => [isPct ? `${v}%` : v, 'Valor']}
+              />
+              <Bar dataKey="valor" fill="#E30613" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Desglose simple */}
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+          {dataset.barras.slice(0, 4).map((b) => (
+            <div key={b.name} className="border rounded-xl p-2 dark:border-slate-800">
+              <div className="font-semibold">{b.name}</div>
+              <div className="text-slate-600 dark:text-slate-300">
+                {isPct ? `${b.valor}%` : b.valor}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ============================
+           APP
+============================ */
+export default function App() {
   const [vista, setVista] = useState<'general'|'zona'|'jefes'>('general')
   const [periodo, setPeriodo] = useState<'1m'|'3m'|'6m'|'1a'>('3m')
   const [busqueda, setBusqueda] = useState('')
@@ -234,10 +336,11 @@ const detalleMocks: Record<
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
   }
 
-  const tendenciaGeneral = [
-    { mes: 'Ene', valor: 5.8 }, { mes: 'Feb', valor: 6.0 }, { mes: 'Mar', valor: 6.2 },
-    { mes: 'Abr', valor: 6.4 }, { mes: 'May', valor: 6.3 }, { mes: 'Jun', valor: 6.5 },
-  ]
+  // === NUEVO: control modal de detalle
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [detailMetric, setDetailMetric] = useState<MetricKey | null>(null)
+  const openDetail = (m: MetricKey) => { setDetailMetric(m); setDetailOpen(true) }
+  const closeDetail = () => { setDetailOpen(false); setDetailMetric(null) }
 
   return (
     <div className="p-6 min-h-screen">
@@ -379,17 +482,26 @@ const detalleMocks: Record<
             <p className="text-sm text-slate-500">Promedio ponderado (Satisfacción, Clima, Acciona, Ventas, Comunidad)</p>
           </div>
 
-          {['satisfaccion','clima','acciona','ventas','comunidad','formacion'].map((k)=>{
+          {(['satisfaccion','clima','acciona','ventas','comunidad','formacion'] as MetricKey[]).map((k)=>{
             const val = promedio(k as any)
             const meta = (metas as any)[k]
             const gap = +(val - meta).toFixed(1)
             const ok = gap >= 0
+            const isPct = k==='acciona'||k==='ventas'||k==='formacion'
             return (
-              <div className="card p-4" key={k}>
-                <h3 className="card-title capitalize">{k==='acciona'||k==='ventas'||k==='formacion'?k+' (%)':k}</h3>
+              <div
+                className="card p-4 transition hover:shadow-md cursor-pointer outline-none"
+                key={k}
+                role="button"
+                tabIndex={0}
+                onClick={()=>openDetail(k)}
+                onKeyDown={(e)=>{ if(e.key==='Enter'||e.key===' ') openDetail(k)}}
+                aria-label={`Ver detalle de ${metricLabels[k]}`}
+              >
+                <h3 className="card-title capitalize">{metricLabels[k]}</h3>
                 <div className="flex items-center gap-3">
-                  <p className="kpi">{val}{k==='acciona'||k==='ventas'||k==='formacion'?'%':''}</p>
-                  <span className={`badge ${ok?'badge-ok':'badge-warn'}`}>{ok?'+':''}{gap}{k==='acciona'||k==='ventas'||k==='formacion'?'%':''} vs meta</span>
+                  <p className="kpi">{val}{isPct?'%':''}</p>
+                  <span className={`badge ${ok?'badge-ok':'badge-warn'}`}>{ok?'+':''}{gap}{isPct?'%':''} vs meta</span>
                 </div>
               </div>
             )
@@ -488,6 +600,9 @@ const detalleMocks: Record<
           ))}
         </div>
       )}
+
+      {/* Modal de detalle */}
+      <DetailModal open={detailOpen} onClose={closeDetail} metric={detailMetric} />
     </div>
   )
 }
