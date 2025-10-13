@@ -53,20 +53,25 @@ const metricLabels: Record<MetricKey, string> = {
 
 const detalleMocks: Record<
   MetricKey,
-  { titulo: string; barras: { name: string; valor: number }[]; notaProm: number; variacion?: string }
+  {
+    titulo: string
+    barras: { name: string; valor: number; variacion?: number }[]
+    notaProm: number
+    variacion?: string
+  }
 > = {
   satisfaccion: {
     titulo: 'Detalle: Satisfacción Global por Área/Servicio',
     notaProm: 6.3,
     variacion: '+1.6%',
     barras: [
-      { name: 'Atención al Cliente', valor: 6.6 },
-      { name: 'Combustible', valor: 6.2 },
-      { name: 'Tienda', valor: 6.1 },
-      { name: 'Lavado', valor: 6.0 },
-      { name: 'Mantenimiento', valor: 5.9 },
-      { name: 'Marketing', valor: 6.2 },
-      { name: 'Servicios Adicionales', valor: 6.0 },
+      { name: 'Atención al Cliente', valor: 6.8, variacion: 1.5 },
+      { name: 'Combustible', valor: 6.5, variacion: 1.6 },
+      { name: 'Tienda', valor: 6.3, variacion: 1.6 },
+      { name: 'Lavado', valor: 6.1, variacion: 1.7 },
+      { name: 'Mantenimiento', valor: 5.9, variacion: 1.7 },
+      { name: 'Marketing', valor: 6.4, variacion: 1.6 },
+      { name: 'Servicios Adicionales', valor: 6.0, variacion: 1.2 },
     ],
   },
   clima: {
@@ -139,6 +144,22 @@ function DetailModal({
   const dataset = detalleMocks[metric]
   const isPct = ['acciona', 'ventas', 'formacion'].includes(metric)
 
+  const scoreColor = (v: number) =>
+    v >= 6.5 ? 'text-emerald-600' : v >= 6.0 ? 'text-orange-600' : 'text-red-600'
+
+  const TrendPill = ({ delta }: { delta: number }) => {
+    const up = delta >= 0
+    return (
+      <span
+        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+          up ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+        }`}
+      >
+        {up ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}%
+      </span>
+    )
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
@@ -146,7 +167,7 @@ function DetailModal({
       role="dialog"
       onClick={onClose}
     >
-      {/* Backdrop */}
+      {/* Fondo */}
       <div className="absolute inset-0 bg-black/40" />
       {/* Card */}
       <div
@@ -163,52 +184,67 @@ function DetailModal({
 
         <h3 className="card-title mb-2">{dataset.titulo}</h3>
 
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-4">
           <div className="text-3xl font-extrabold text-[--copec-red]">
-            {dataset.notaProm}{isPct ? '%' : ''}
+            {dataset.notaProm}
+            {isPct ? '%' : ''}
           </div>
-          {dataset.variacion && (
-            <span className="badge badge-ok">↑ {dataset.variacion}</span>
-          )}
+          {dataset.variacion && <span className="badge badge-ok">↑ {dataset.variacion}</span>}
         </div>
 
-        <div style={{ width: '100%', height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={dataset.barras}
-              layout="vertical"
-              margin={{ left: 80, right: 16, top: 8, bottom: 8 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                type="number"
-                domain={[0, isPct ? 100 : 7]}
-              />
-              <YAxis dataKey="name" type="category" width={140} />
-              <Tooltip
-                formatter={(v: number) => [isPct ? `${v}%` : v, 'Valor']}
-              />
-              <Bar dataKey="valor" fill="#E30613" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {metric === 'satisfaccion' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {dataset.barras.map((b) => (
+              <div
+                key={b.name}
+                className="border rounded-2xl p-4 bg-white dark:bg-slate-900 dark:border-slate-800"
+              >
+                <div className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+                  {b.name}
+                </div>
+                <div className="text-sm text-slate-500">Calidad y servicio</div>
 
-        {/* Desglose simple */}
-        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-          {dataset.barras.slice(0, 4).map((b) => (
-            <div key={b.name} className="border rounded-xl p-2 dark:border-slate-800">
-              <div className="font-semibold">{b.name}</div>
-              <div className="text-slate-600 dark:text-slate-300">
-                {isPct ? `${b.valor}%` : b.valor}
+                <div className="mt-3 flex items-center justify-between">
+                  <div className={`text-3xl font-bold ${scoreColor(b.valor)}`}>{b.valor.toFixed(1)}</div>
+                  {typeof b.variacion === 'number' && <TrendPill delta={b.variacion} />}
+                </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={dataset.barras}
+                  layout="vertical"
+                  margin={{ left: 80, right: 16, top: 8, bottom: 8 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" domain={[0, isPct ? 100 : 7]} />
+                  <YAxis dataKey="name" type="category" width={140} />
+                  <Tooltip formatter={(v: number) => [isPct ? `${v}%` : v, 'Valor']} />
+                  <Bar dataKey="valor" fill="#E30613" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-          ))}
-        </div>
+
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              {dataset.barras.slice(0, 4).map((b) => (
+                <div key={b.name} className="border rounded-xl p-2 dark:border-slate-800">
+                  <div className="font-semibold">{b.name}</div>
+                  <div className="text-slate-600 dark:text-slate-300">
+                    {isPct ? `${b.valor}%` : b.valor}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
 }
-
 /* ============================
            APP
 ============================ */
@@ -219,7 +255,7 @@ export default function App() {
   const [selectedZona, setSelectedZona] = useState<string|null>(null)
 
   const [metas] = useState({
-    satisfaccion: 6.3, clima: 6.2, acciona: 85, ventas: 95, comunidad: 80, poa: 85, formacion: 80
+    satisfacción: 6.3, clima: 6.2, acciona: 85, ventas: 95, comunidad: 80, poa: 85, formacion: 80
   })
   const [criticos, setCriticos] = useState<any>(() => {
     const saved = localStorage.getItem('criticos_copec')
