@@ -39,8 +39,10 @@ type MetricKey =
   | 'clima'
   | 'acciona'
   | 'ventas'
-  | 'comunidad'
+  | 'saturación'
   | 'formacion'
+  | 'Ranking Jefe de zona'
+  
 
 const metricLabels: Record<MetricKey, string> = {
   satisfaccion: 'Satisfacción Global',
