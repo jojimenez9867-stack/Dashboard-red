@@ -49,8 +49,9 @@ const metricLabels: Record<MetricKey, string> = {
   clima: 'Clima',
   acciona: 'Acciona (%)',
   ventas: 'Ventas (%)',
-  comunidad: 'Comunidad',
+  saturación: 'Saturación',
   formacion: 'Formación (%)',
+  Ranking Jefe de zona: 'Jefe de zona'
 }
 
 const detalleMocks: Record<
